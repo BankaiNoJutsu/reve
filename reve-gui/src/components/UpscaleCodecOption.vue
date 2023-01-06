@@ -10,6 +10,10 @@
           text: 'x265',
           value: 'libx265',
         },
+        {
+          text: 'av1',
+          value: 'libsvtav1',
+        },
       ]"
       item-title="text"
       item-value="value"

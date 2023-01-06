@@ -10,10 +10,11 @@ pub fn upscale_video(
     save_path: String,
     upscale_factor: String,
     upscale_type: String,
+    upscale_codec: String,
 ) -> Result<String, String> {
     let upscale_information = format!(
-        "-> Video: {}\n-> Save path: {}\n-> Upscale factor: {}\n-> Upscale type: {}\n",
-        &path, &save_path, &upscale_factor, &upscale_type
+        "-> Video: {}\n-> Save path: {}\n-> Upscale factor: {}\n-> Upscale type: {}\n-> Upscale codec: {}\n",
+        &path, &save_path, &upscale_factor, &upscale_type, &upscale_codec
     );
     println!("{}", &upscale_information);
     utils::write_log(&upscale_information);
@@ -39,16 +40,16 @@ pub fn upscale_video(
         utils::write_log("Upscaling failed: reve-cli.exe not found");
         // log the command being executed
         utils::write_log(
-            format!("Command: reve-cli.exe -i {} -s {} -o {}", &path, &upscale_factor, &save_path).as_ref(),
+            format!("Command: reve-cli.exe -i {} -s {} -o {} -e {}", &path, &upscale_factor, &save_path, &upscale_codec).as_ref(),
         );
         return Err(String::from("Upscaling failed: reve-cli.exe not found"));
     } else {
         utils::write_log("reve-cli.exe found");
         utils::write_log(
-            format!("Command: reve-cli.exe -i {} -s {} -o {}", &path, &upscale_factor, &save_path).as_ref(),
+            format!("Command: reve-cli.exe -i {} -s {} -o {} -e {}", &path, &upscale_factor, &save_path, &upscale_codec).as_ref(),
         );
         let output = Command::new("reve-cli.exe")
-            .args(["-i", &path, "-s", &upscale_factor, "-o", &save_path])
+            .args(["-i", &path, "-s", &upscale_factor, "-o", &save_path, "-e", &upscale_codec])
             .output()
             .expect("failed to execute process");
         if output.status.success() {

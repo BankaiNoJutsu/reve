@@ -337,16 +337,17 @@ function upscaleMultipleImages() {
   try {
     for (let i = 0; i < imagePaths.value.length; i++) {
       let outputFile: string = imagePaths.value[i].path;
-    // Replaces the filename of file in the given path with '<path><filename>_upscaled-<upscale_factor>x.<extension>'
+    // Replaces the filename of file in the given path with '<path><filename>-<upscale_factor>x.<codec>.<extension>'
       outputFile = outputFile.replace(
         /(.*)[\/\\]([^\/\\]+)\.([^\/\\]+)$/,
-        `$1/$2_upscaled-${upscaleFactor.value}x.$3`
+        `$1/$2-${upscaleFactor.value}x.${upscaleCodec.value}.$3`
       );      
       invoke("upscale_video", {
         path: imagePaths.value[i].path,
         savePath: outputFile,
         upscaleFactor: upscaleFactor.value,
         upscaleType: upscaleType.value,
+        upscaleCodec: upscaleCodec.value,
       });
       imagePaths.value[i].isReady = true;
     }
@@ -375,10 +376,10 @@ function upscaleSingleImage() {
 /*     defaultPath: await invoke("replace_file_suffix", {
        path: imagePath.value,
     }), */
-    // Replaces the filename of file in the given path with '<path><filename>_upscaled-<upscale_factor>x.<extension>'
+    // Replaces the filename of file in the given path with '<path><filename>-<upscale_factor>x.<codec>.<extension>'
     defaultPath: imagePath.value.replace(
       /(.*)[\/\\]([^\/\\]+)\.([^\/\\]+)$/,
-      `$1/$2_upscaled-${upscaleFactor.value}x.$3`
+      `$1/$2-${upscaleFactor.value}x.${upscaleCodec.value}.$3`
     ),
   });
   if (imageSavePath === null) {
@@ -392,6 +393,7 @@ function upscaleSingleImage() {
       savePath: imageSavePath,
       upscaleFactor: upscaleFactor.value,
       upscaleType: upscaleType.value,
+      upscaleCodec: upscaleCodec.value,
     });
     alert(output);
   } catch (err: any) {
