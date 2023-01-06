@@ -646,15 +646,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dirs"
-version = "4.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca3aa72a6f96ea37bbc5aa912f6788242832f75369bdfdadcb0e38423f100059"
-dependencies = [
- "dirs-sys",
-]
-
-[[package]]
 name = "dirs-next"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2458,7 +2449,6 @@ dependencies = [
 name = "reve-gui"
 version = "0.1.8"
 dependencies = [
- "dirs 4.0.0",
  "serde",
  "serde_json",
  "tauri",
@@ -3246,7 +3236,7 @@ version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "76971977e6121664ec1b960d1313aacfa75642adc93b9d4d53b247bd4cb1747e"
 dependencies = [
- "dirs 2.0.2",
+ "dirs",
  "fnv",
  "nom",
  "phf 0.8.0",

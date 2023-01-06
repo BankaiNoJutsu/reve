@@ -1,8 +1,7 @@
-use std::{error::Error, path::PathBuf};
+use std::{env::current_dir, error::Error, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-pub const CONFIG_FOLDER: &str = "reve-gui";
 pub const LOG_FILE: &str = "reve-gui.log";
 const CONFIG_FILE: &str = "reve-gui-config.json";
 
@@ -13,14 +12,18 @@ pub struct ConfigData {
 
     #[serde(rename = "default-upscale-type")]
     default_upscale_type: String,
+
+    #[serde(rename = "default-upscale-factor")]
+    default_upscale_factor: String,
 }
 
 impl ConfigData {
     /// Returns a default configuration.
     pub fn default() -> ConfigData {
         Self {
-            application_logs: false,
+            application_logs: true,
             default_upscale_type: String::from("realesr-animevideov3"),
+            default_upscale_factor: String::from("2"),
         }
     }
 
@@ -47,6 +50,11 @@ impl ConfigData {
     pub fn get_default_upscale_type(&self) -> String {
         self.default_upscale_type.clone()
     }
+
+    /// Returns the value of the default-upscale-factor key in the `ConfigData`.
+    pub fn get_default_upscale_factor(&self) -> String {
+        self.default_upscale_factor.clone()
+    }
 }
 
 pub struct Config {
@@ -57,10 +65,8 @@ pub struct Config {
 impl Config {
     /// Create a new config with the content as None or the content of `ConfigData` passed as argument.
     pub fn new(config: Option<ConfigData>) -> Self {
-        Self::create_config_folder(CONFIG_FOLDER).expect("Failed to create config folder");
-        let path = dirs::config_dir()
+        let path = current_dir()
             .expect("Could not find config directory")
-            .join(CONFIG_FOLDER)
             .join(CONFIG_FILE);
 
         Self {
@@ -88,13 +94,6 @@ impl Config {
     pub fn save(&self) -> Result<(), Box<dyn Error>> {
         let content = serde_json::to_string_pretty(&self.content)?;
         std::fs::write(&self.path, content)?;
-        Ok(())
-    }
-
-    /// Create a config folder in the config directory.
-    fn create_config_folder(folder: &str) -> Result<(), Box<dyn Error>> {
-        let path = dirs::config_dir().ok_or("Failed to get config directory")?;
-        std::fs::create_dir_all(path.join(folder))?;
         Ok(())
     }
 

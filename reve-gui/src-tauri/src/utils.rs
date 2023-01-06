@@ -1,6 +1,6 @@
-use std::{fs::OpenOptions, io::Write, path::PathBuf};
+use std::{env::current_dir, fs::OpenOptions, io::Write, path::PathBuf};
 
-use crate::configuration::{self, ConfigData, CONFIG_FOLDER, LOG_FILE};
+use crate::configuration::{self, ConfigData, LOG_FILE};
 
 pub struct Logger {
     path: PathBuf,
@@ -9,9 +9,8 @@ pub struct Logger {
 impl Logger {
     /// Create a new logger.
     pub fn new() -> Self {
-        let path = dirs::config_dir()
+        let path = current_dir()
             .expect("Failed to locate cache directory")
-            .join(CONFIG_FOLDER)
             .join(LOG_FILE);
         Self { path }
     }
@@ -49,12 +48,31 @@ impl Logger {
     }
 }
 
-/// Replaces the suffix of the given path with `_upscaled-4x.<extension>`
+/* /// Replaces the suffix of the given path with `_upscaled-<upscale_factor>x.<extension>`
 #[tauri::command]
-pub fn replace_file_suffix(path: &str, upscale_factor: &str, extension: &str) -> String {
-    let path = path.strip_suffix(extension).unwrap();
-    path.to_owned() + "_upscaled-" + upscale_factor + "x." + extension
-}
+pub fn replace_file_suffix(path: String, upscale_factor: String) -> String {
+    let path = PathBuf::from(path);
+    let file_name = path
+        .file_name()
+        .expect("Failed to get file name")
+        .to_str()
+        .expect("Failed to convert file name to string");
+    let file_name = file_name.replace(
+        &format!(".{}", path.extension().expect("Failed to get file extension").to_str().expect("Failed to convert file extension to string")),
+        &format!("_upscaled-{}x.{}", upscale_factor, path.extension().expect("Failed to get file extension").to_str().expect("Failed to convert file extension to string")),
+    );
+    write_log(&format!(
+        "Final path: {}",
+        path.with_file_name(&file_name)
+            .to_str()
+            .expect("Failed to convert path to string")
+    ));
+
+    path.with_file_name(file_name)
+        .to_str()
+        .expect("Failed to convert path to string")
+        .to_string()
+} */
 
 /// Loads the configuration file and creates a default one if it does not exist or if it is invalid.
 #[tauri::command]
@@ -94,15 +112,15 @@ mod tests {
     #[test]
     fn test_replace_file_suffix_linux() {
         assert_eq!(
-            replace_file_suffix("/home/user/image.png"),
+            replace_file_suffix("/home/user/image.png", "4", "png"),
             "/home/user/image_upscaled-4x.png"
         );
         assert_eq!(
-            replace_file_suffix("/home/user/image.jpg"),
+            replace_file_suffix("/home/user/image.jpg", "4", "jpg"),
             "/home/user/image_upscaled-4x.jpg"
         );
         assert_eq!(
-            replace_file_suffix("/home/user/image.jpeg"),
+            replace_file_suffix("/home/user/image.jpeg", "4", "jpeg"),
             "/home/user/image_upscaled-4x.jpeg"
         );
     }
@@ -110,15 +128,15 @@ mod tests {
     #[test]
     fn test_replace_file_suffix_windows() {
         assert_eq!(
-            replace_file_suffix(r#"C:\Users\user\image.png"#),
+            replace_file_suffix(r#"C:\Users\user\image.png"#, "4", "png"),
             r#"C:\Users\user\image_upscaled-4x.png"#
         );
         assert_eq!(
-            replace_file_suffix(r#"C:\Users\user\image.jpg"#),
+            replace_file_suffix(r#"C:\Users\user\image.jpg"#, "4", "jpg"),
             r#"C:\Users\user\image_upscaled-4x.jpg"#
         );
         assert_eq!(
-            replace_file_suffix(r#"C:\Users\user\image.jpeg"#),
+            replace_file_suffix(r#"C:\Users\user\image.jpeg"#, "4", "jpeg"),
             r#"C:\Users\user\image_upscaled-4x.jpeg"#
         );
     }
@@ -126,7 +144,7 @@ mod tests {
     #[test]
     fn test_replace_file_suffix_no_suffix() {
         assert_eq!(
-            replace_file_suffix("/home/user/image"),
+            replace_file_suffix("/home/user/image", "4", "png"),
             "/home/user/image_upscaled-4x.png"
         );
     }
@@ -134,7 +152,7 @@ mod tests {
     #[test]
     fn test_replace_file_suffix_suffix_not_implemented() {
         assert_eq!(
-            replace_file_suffix("/home/user/image.bmp"),
+            replace_file_suffix("/home/user/image.bmp", "4", "png"),
             "/home/user/image.bmp_upscaled-4x.png"
         );
     }
@@ -142,7 +160,7 @@ mod tests {
     #[test]
     fn test_replace_file_suffix_spaces_in_path() {
         assert_eq!(
-            replace_file_suffix("/home/user two/image with spaces.png"),
+            replace_file_suffix("/home/user two/image with spaces.png", "4", "png"),
             "/home/user two/image with spaces_upscaled-4x.png"
         );
     }

@@ -6,10 +6,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+reve-gui-config.json*
 
 node_modules
 dist
 dist-ssr
+temp
+reve.db
 *.local
 
 # Editor directories and files

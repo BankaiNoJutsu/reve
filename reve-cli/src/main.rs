@@ -2,10 +2,8 @@ use clap::Parser;
 use clearscreen::clear;
 use colored::Colorize;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
-use path_clean::PathClean;
 use reve_shared::*;
 use rusqlite::{params, Connection};
-use std::env;
 use std::fs;
 use std::fs::metadata;
 use std::io::ErrorKind;
@@ -15,21 +13,6 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use std::time::Instant;
-
-fn absolute_path(path: impl AsRef<Path>) -> String {
-    let path = path.as_ref();
-
-    let absolute_path = if path.is_absolute() {
-        path.to_path_buf()
-    } else {
-        env::current_dir()
-            .expect("could not get current path")
-            .join(path)
-    }
-    .clean();
-
-    absolute_path.into_os_string().into_string().unwrap()
-}
 
 fn main() {
     let main_now = Instant::now();

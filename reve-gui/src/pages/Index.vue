@@ -186,15 +186,6 @@ listen("tauri://file-drop", async (event) => {
       alert("Please select a valid video file.");
       return;
     }
-    try {
-      const imageBytes = await invoke("read_image_base64", { path: files[0] });
-      imageBlob.value = `data:image/png;base64,${imageBytes}`;
-      imagePath.value = files[0];
-    } catch (err) {
-      await invoke("write_log", {
-        message: `Error reading image: ${err}`,
-      });
-    }
   }
 });
 
@@ -224,6 +215,15 @@ function openAboutPage() {
  */
 function setUpscaleType(value: UpscaleType) {
   upscaleType.value = value;
+}
+
+/**
+ * Sets the upscale factor.
+ *
+ * @param value - The upscale factor. Available values are `2`, `3` and `4`.
+ */
+function setUpscaleFactor(value: UpscaleFactor) {
+  upscaleFactor.value = value;
 }
 
 function openConfig() {
@@ -295,15 +295,6 @@ async function openVideo() {
     clearSelectedImage();
     isMultipleFiles.value = false;
     imagePath.value = selected[0];
-    try {
-      const imageBytes = await invoke("read_image_base64", {
-        path: imagePath.value,
-      });
-      imageBlob.value = `data:image/png;base64,${imageBytes}`;
-    } catch (err: any) {
-      await invoke("write_log", { message: err.toString() });
-      alert(err);
-    }
   }
 }
 
@@ -338,12 +329,13 @@ async function upscaleMultipleImages() {
   showMultipleFilesProcessingIcon.value = true;
   try {
     for (let i = 0; i < imagePaths.value.length; i++) {
-      let outputFile: string = await invoke("replace_file_suffix", {
+/*       let outputFile: string = await invoke("replace_file_suffix", {
         path: imagePaths.value[i].path,
-      });
+      }); */
+      let outputFile = imagePaths.value[i].path;
 
       outputFile = `${outputFolder}/${outputFile.split("/").pop()}`;
-      await invoke("upscale_single_image", {
+      await invoke("upscale_video", {
         path: imagePaths.value[i].path,
         savePath: outputFile,
         upscaleFactor: upscaleFactor.value,
@@ -369,11 +361,14 @@ async function upscaleMultipleImages() {
  */
 async function upscaleSingleImage() {
   if (imagePath.value === "") {
-    alert("No image selected");
+    alert("No video selected");
     return;
   }
   const imageSavePath = await save({
-    defaultPath: await invoke("replace_file_suffix", { path: imagePath.value }),
+/*     defaultPath: await invoke("replace_file_suffix", {
+       path: imagePath.value,
+    }), */
+    defaultPath: imagePath.value,
   });
   if (imageSavePath === null) {
     // user cancelled the selection
@@ -381,7 +376,7 @@ async function upscaleSingleImage() {
   }
   isProcessing.value = true;
   try {
-    const output = await invoke("upscale_single_image", {
+    const output = await invoke("upscale_video", {
       path: imagePath.value,
       savePath: imageSavePath,
       upscaleFactor: upscaleFactor.value,

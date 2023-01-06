@@ -3,7 +3,7 @@
     <v-select
       :disabled="props.disabled"
       label="Upscale Factor"
-      v-model="selectType"
+      v-model="selectFactor"
       variant="solo"
       :items="[
         {
@@ -33,14 +33,27 @@ const props = defineProps<{
   disabled: boolean;
 }>();
 
+// The upscale type. Default is `general`.
+const selectFactor = ref("2x");
+
 const emit = defineEmits(["upscale-factor-changed"]);
 
-// The upscale type. Default is `general`.
-const selectType = ref("2x");
+onMounted(async () => {
+  try {
+    const config = await invoke<{ ["default-upscale-factor"]: string }>(
+      "load_configuration"
+    );
+    selectFactor.value = config["default-upscale-factor"];
+  } catch (error: any) {
+    await invoke("write_log", { message: error.toString() });
+    alert(error);
+  }
+});
 
-function updateUpscaleFactor(value: any) {
-  emit("upscale-factor-changed", value.target.value);
-}
+// Watch for the select between `general` and `digital` type and sends selected type to the parent component.
+watch(selectFactor, (value) => {
+  emit("upscale-factor-changed", value);
+});
 </script>
 
 <style scoped lang="scss">
