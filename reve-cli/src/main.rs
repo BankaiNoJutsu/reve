@@ -494,6 +494,7 @@ fn work(
 
     // check if files are marked as processing in database that is not the current file and set status as 'pending'
     let conn = Connection::open("reve.db").unwrap();
+    create_db_table(&conn);
     conn.execute(
         "UPDATE video_info SET status = 'pending' WHERE status = 'processing' AND filepath != ?1",
         params![args.inputpath],

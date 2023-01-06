@@ -616,6 +616,32 @@ pub fn update_db_status(
     Ok(())
 }
 
+pub fn create_db_table(conn: &Connection) -> Result<(), rusqlite::Error> {
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS video_info (
+            id INTEGER PRIMARY KEY,
+            filename TEXT NOT NULL,
+            filepath TEXT NOT NULL,
+            width INTEGER NOT NULL,
+            height INTEGER NOT NULL,
+            duration TEXT NOT NULL,
+            pixel_format TEXT NOT NULL,
+            display_aspect_ratio TEXT NOT NULL,
+            sample_aspect_ratio TEXT NOT NULL,
+            format TEXT NOT NULL,
+            size TEXT NOT NULL,
+            folder_size INTEGER NOT NULL,
+            bitrate TEXT NOT NULL,
+            codec TEXT NOT NULL,
+            resolution TEXT NOT NULL,
+            status TEXT NOT NULL,
+            hash TEXT NOT NULL
+        )",
+        params![],
+    )?;
+    Ok(())
+}
+
 pub fn get_ffprobe_output(filename: &str) -> Result<Value, String> {
     let output: Output = Command::new("ffprobe")
         .args([
