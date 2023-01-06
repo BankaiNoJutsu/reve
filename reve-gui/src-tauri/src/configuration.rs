@@ -50,11 +50,6 @@ impl ConfigData {
     pub fn get_default_upscale_type(&self) -> String {
         self.default_upscale_type.clone()
     }
-
-    /// Returns the value of the default-upscale-factor key in the `ConfigData`.
-    pub fn get_default_upscale_factor(&self) -> String {
-        self.default_upscale_factor.clone()
-    }
 }
 
 pub struct Config {

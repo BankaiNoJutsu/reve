@@ -1323,7 +1323,7 @@ pub fn merge_video_parts(input_path: &String, output_path: &String) -> std::proc
         .expect("failed to execute process")
 }
 
-pub fn pre_work() {
+pub fn prepare() {
     let main_now = Instant::now();
 
     let mut args;
@@ -1545,7 +1545,7 @@ pub fn pre_work() {
             )
             .unwrap();
 
-            work(
+            process(
                 &args,
                 dar.clone(),
                 current_file_count as i32,
@@ -1655,7 +1655,7 @@ pub fn pre_work() {
         let json_output = std::str::from_utf8(&ffprobe_output.stdout[..]).unwrap();
         let height = check_ffprobe_output_i8(json_output, &resolution.to_string());
         if height.unwrap() == 1 {
-            work(
+            process(
                 &args,
                 dar,
                 current_file_count as i32,
@@ -1695,7 +1695,7 @@ pub fn pre_work() {
     }
 }
 
-pub fn work(
+pub fn process(
     args: &Args,
     dar: String,
     current_file_count: i32,
@@ -2161,7 +2161,7 @@ pub fn work(
                     break;
                 }
             } else {
-                if dar == "0" {
+                if dar == "0" || dar == "N/A" {
                     merge_video_parts(&txt_list_path.to_string(), &temp_video_path.to_string());
                 } else {
                     merge_video_parts_dar(

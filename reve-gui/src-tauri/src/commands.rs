@@ -4,21 +4,6 @@ use std::process::Stdio;
 use tauri::api::process::{Command, CommandEvent};
 use reve_shared::*;
 
-enum UpscaleTypes {
-    General,
-    Digital,
-}
-
-impl UpscaleTypes {
-    /// Returns the model to be used in the upscale.
-    fn upscale_type_as_str(&self) -> &str {
-        match self {
-            UpscaleTypes::General => "realesr-animevideov3",
-            UpscaleTypes::Digital => "realesr-animevideov3",
-        }
-    }
-}
-
 #[tauri::command]
 pub fn upscale_video(
     path: String,

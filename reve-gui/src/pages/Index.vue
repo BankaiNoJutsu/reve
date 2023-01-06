@@ -370,8 +370,8 @@ function upscaleSingleImage() {
     }), */
     // Replaces the filename of file in the given path with '<path><filename>_upscaled-<upscale_factor>x.<extension>'
     defaultPath: imagePath.value.replace(
-      /([^/\\]+)(\.[^.]+)$/,
-      `$1_upscaled-${upscaleFactor.value}x$2`
+      /(.*)[\/\\]([^\/\\]+)\.([^\/\\]+)$/,
+      `$1/$2_upscaled-${upscaleFactor.value}x.$3`
     ),
   });
   if (imageSavePath === null) {
