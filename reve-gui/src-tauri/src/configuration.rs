@@ -15,6 +15,12 @@ pub struct ConfigData {
 
     #[serde(rename = "default-upscale-factor")]
     default_upscale_factor: String,
+
+    #[serde(rename = "default-upscale-codec")]
+    default_upscale_codec: String,
+
+    //#[serde(rename = "default-output-directory")]
+    //default_output_directory: String,
 }
 
 impl ConfigData {
@@ -24,6 +30,7 @@ impl ConfigData {
             application_logs: true,
             default_upscale_type: String::from("realesr-animevideov3"),
             default_upscale_factor: String::from("2"),
+            default_upscale_codec: String::from("libx265"),
         }
     }
 

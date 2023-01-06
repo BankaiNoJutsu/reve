@@ -1,14 +1,14 @@
 <template>
-  <div class="upscale-types">
+  <div class="upscale-codec">
     <v-select
       :disabled="props.disabled"
-      label="Upscale Type"
-      v-model="selectType"
+      label="Upscale Codec"
+      v-model="selectCodec"
       variant="solo"
       :items="[
         {
-          text: 'realesr-animevideov3',
-          value: 'realesr-animevideov3',
+          text: 'x265',
+          value: 'libx265',
         },
       ]"
       item-title="text"
@@ -26,31 +26,31 @@ const props = defineProps<{
   disabled: boolean;
 }>();
 
-// The upscale type. Default is `general`.
-const selectType = ref("realesr-animevideov3");
+// The upscale codec. Default is `general`.
+const selectCodec = ref("x265");
 
-const emit = defineEmits(["upscale-type-changed"]);
+const emit = defineEmits(["upscale-codec-changed"]);
 
 onMounted(async () => {
   try {
-    const config = await invoke<{ ["default-upscale-type"]: string }>(
+    const config = await invoke<{ ["default-upscale-codec"]: string }>(
       "load_configuration"
     );
-    selectType.value = config["default-upscale-type"];
+    selectCodec.value = config["default-upscale-codec"];
   } catch (error: any) {
     await invoke("write_log", { message: error.toString() });
     alert(error);
   }
 });
 
-// Watch for the select between `general` and `digital` type and sends selected type to the parent component.
-watch(selectType, (value) => {
-  emit("upscale-type-changed", value);
+// Watch for the select between `general` and `digital` codec and sends selected codec to the parent component.
+watch(selectCodec, (value) => {
+  emit("upscale-codec-changed", value);
 });
 </script>
 
 <style scoped lang="scss">
-.upscale-types {
+.upscale-codec {
   display: inline-block;
 }
 </style>

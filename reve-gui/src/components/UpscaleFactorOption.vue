@@ -21,6 +21,7 @@
       ]"
       item-title="text"
       item-value="value"
+      hide-details
     ></v-select>
   </div>
 </template>

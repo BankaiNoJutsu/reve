@@ -11,7 +11,7 @@
         class="mt-6"
         size="large"
         rounded="lg"
-        :prepend-icon="mdiFileImage"
+        :prepend-icon="mdiVideo"
         :disabled="isProcessing"
         elevation="0"
         @click="openVideo"
@@ -28,10 +28,15 @@
         class="mt-2"
         @upscale-factor-changed="updateUpscaleFactor" 
       />
+      <UpscaleCodecOptions
+        :disabled="isProcessing"
+        class="mt-2"
+        @upscale-codec-changed="updateUpscaleCodec"
+      />
       <v-btn
         size="large"
         rounded="lg"
-        class="mb-2"
+        class="mt-2"
         :disabled="isReadyToUpscale"
         elevation="0"
         width="310"
@@ -44,6 +49,7 @@
       <v-btn
         size="large"
         rounded="lg"
+        class="mt-2"
         :disabled="isProcessing"
         elevation="0"
         @click="clearSelectedImage"
@@ -77,7 +83,7 @@
         <v-icon
           v-else
           size="16"
-          :icon="mdiImageCheck"
+          :icon="mdiVideoCheck"
           v-show="showMultipleFilesProcessingIcon"
         />
         <span class="ml-2">{{ imagePath.path }}</span>
@@ -115,8 +121,9 @@
 import { ref, Ref, computed } from "vue";
 import HorizontalLogo from '../assets/reve-gui-horizontal.png';
 import UpscaleTypeOption from "../components/UpscaleTypeOption.vue";
-import UpscaleFactorOptions from "../components/UpscaleFactorOptions.vue";
-import { mdiFileImage, mdiImageCheck, mdiMenu } from "@mdi/js";
+import UpscaleFactorOptions from "../components/UpscaleFactorOption.vue";
+import UpscaleCodecOptions from "../components/UpscaleCodecOption.vue";
+import { mdiVideo, mdiVideoCheck, mdiMenu } from "@mdi/js";
 import { invoke } from "@tauri-apps/api/tauri";
 import { listen } from "@tauri-apps/api/event";
 import { open, save } from "@tauri-apps/api/dialog";
@@ -130,6 +137,7 @@ interface ImagePathsDisplay {
 
 type UpscaleType = "realesr-animevideov3";
 type UpscaleFactor = "2" | "3" | "4";
+type UpscaleCodec = "av1" | "x265";
 
 const isProcessing = ref(false);
 const imagePath = ref("");
@@ -137,6 +145,7 @@ const imagePaths: Ref<ImagePathsDisplay[]> = ref([]);
 const imageBlob = ref("");
 const upscaleFactor: Ref<UpscaleFactor> = ref("2");
 const upscaleType: Ref<UpscaleType> = ref("realesr-animevideov3");
+const upscaleCodec: Ref<UpscaleCodec> = ref("x265");
 const isMultipleFiles = ref(false);
 const showMultipleFilesProcessingIcon = ref(false);
 
@@ -219,11 +228,16 @@ function setUpscaleType(value: UpscaleType) {
 
 /**
  * Sets the upscale factor.
- *
- * @param value - The upscale factor. Available values are `2`, `3` and `4`.
  */
-function setUpscaleFactor(value: UpscaleFactor) {
+ function updateUpscaleFactor(value: UpscaleFactor) {
   upscaleFactor.value = value;
+}
+
+/**
+ * Sets the upscale codec.
+ */
+function updateUpscaleCodec(value: UpscaleCodec) {
+  upscaleCodec.value = value;
 }
 
 function openConfig() {
@@ -254,13 +268,6 @@ function clearSelectedImage() {
   imageBlob.value = "";
   showMultipleFilesProcessingIcon.value = false;
   isMultipleFiles.value = false;
-}
-
-/**
- * Sets the upscale factor. Currently it's not working.
- */
-function updateUpscaleFactor(value: UpscaleFactor) {
-  upscaleFactor.value = value;
 }
 
 /**
@@ -448,7 +455,7 @@ function upscaleSingleImage() {
 }
 
 .config-button {
-  margin-top: 130px;
+  margin-top: 20px;
 }
 .options-column {
   display: flex;
