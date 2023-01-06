@@ -2,3 +2,5 @@
 /reve-gui/target
 /reve-cli/target
 .idea
+reve-gui-config.json
+reve-gui.log

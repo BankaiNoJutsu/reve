@@ -105,6 +105,11 @@ pub fn get_version() -> String {
     env!("CARGO_PKG_VERSION").to_owned()
 }
 
+#[tauri::command]
+pub fn check_if_file_exists(path: String) -> bool {
+    PathBuf::from(path).exists()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

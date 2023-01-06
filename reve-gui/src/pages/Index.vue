@@ -318,8 +318,8 @@ function startProcessing() {
  *
  * It will update the `isReady` property of the `imagePaths` array to true when the image is ready.
  */
-async function upscaleMultipleImages() {
-  const outputFolder = await open({
+function upscaleMultipleImages() {
+  const outputFolder = open({
     directory: true,
   });
   if (outputFolder === null) {
@@ -329,13 +329,13 @@ async function upscaleMultipleImages() {
   showMultipleFilesProcessingIcon.value = true;
   try {
     for (let i = 0; i < imagePaths.value.length; i++) {
-/*       let outputFile: string = await invoke("replace_file_suffix", {
-        path: imagePaths.value[i].path,
-      }); */
-      let outputFile = imagePaths.value[i].path;
-
-      outputFile = `${outputFolder}/${outputFile.split("/").pop()}`;
-      await invoke("upscale_video", {
+      let outputFile: string = imagePaths.value[i].path;
+    // Replaces the filename of file in the given path with '<path><filename>_upscaled-<upscale_factor>x.<extension>'
+      outputFile = outputFile.replace(
+        /(.*)[\/\\]([^\/\\]+)\.([^\/\\]+)$/,
+        `$1/$2_upscaled-${upscaleFactor.value}x.$3`
+      );      
+      invoke("upscale_video", {
         path: imagePaths.value[i].path,
         savePath: outputFile,
         upscaleFactor: upscaleFactor.value,
@@ -345,7 +345,7 @@ async function upscaleMultipleImages() {
     }
   } catch (err: any) {
     showMultipleFilesProcessingIcon.value = false;
-    await invoke("write_log", { message: err.toString() });
+    invoke("write_log", { message: err.toString() });
     alert(err);
   } finally {
     isProcessing.value = false;
@@ -359,16 +359,20 @@ async function upscaleMultipleImages() {
  *
  * After the image is upscaled, it will send a `alert` to the user.
  */
-async function upscaleSingleImage() {
+function upscaleSingleImage() {
   if (imagePath.value === "") {
     alert("No video selected");
     return;
   }
-  const imageSavePath = await save({
+  const imageSavePath = save({
 /*     defaultPath: await invoke("replace_file_suffix", {
        path: imagePath.value,
     }), */
-    defaultPath: imagePath.value,
+    // Replaces the filename of file in the given path with '<path><filename>_upscaled-<upscale_factor>x.<extension>'
+    defaultPath: imagePath.value.replace(
+      /([^/\\]+)(\.[^.]+)$/,
+      `$1_upscaled-${upscaleFactor.value}x$2`
+    ),
   });
   if (imageSavePath === null) {
     // user cancelled the selection
@@ -376,7 +380,7 @@ async function upscaleSingleImage() {
   }
   isProcessing.value = true;
   try {
-    const output = await invoke("upscale_video", {
+    const output = invoke("upscale_video", {
       path: imagePath.value,
       savePath: imageSavePath,
       upscaleFactor: upscaleFactor.value,
@@ -384,7 +388,7 @@ async function upscaleSingleImage() {
     });
     alert(output);
   } catch (err: any) {
-    await invoke("write_log", { message: err.toString() });
+    invoke("write_log", { message: err.toString() });
     alert(err);
   } finally {
     isProcessing.value = false;
