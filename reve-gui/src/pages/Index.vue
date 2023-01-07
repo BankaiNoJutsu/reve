@@ -56,6 +56,16 @@
       >
         Clear
       </v-btn>
+      <v-btn
+        class="mt-2 cancel-button"
+        size="large"
+        rounded="lg"
+        elevation="0"
+        :disabled="!isProcessing"
+        @click="cancelProcessing"
+      >
+        Cancel
+      </v-btn>
       <div class="d-flex">
         <v-btn
           elevation="0"
@@ -114,6 +124,15 @@
         v-if="!!imageBlob"
       />
     </div>
+  </div>
+  <!-- status bar with a progress bar and a cancel button -->
+  <div class="status-bar">
+    <v-progress-linear
+      :value="getProgress()"
+      height="10"
+      color="primary"
+      class="progress-bar"
+    />
   </div>
 </template>
 
@@ -403,6 +422,25 @@ function upscaleSingleImage() {
     isProcessing.value = false;
   }
 }
+
+function cancelProcessing() {
+  isProcessing.value = false;
+  showMultipleFilesProcessingIcon.value = false;
+}
+
+/** function to get the progress of the current processing and update the progress bar */
+async function getProgress() {
+  const progress = await invoke("get_progress");
+  if (progress === null) {
+    return;
+  }
+  if (progress === 100) {
+    isProcessing.value = false;
+    showMultipleFilesProcessingIcon.value = false;
+  }
+  progress;
+}
+
 </script>
 
 <style scoped lang="scss">
@@ -468,5 +506,13 @@ function upscaleSingleImage() {
   height: 100%;
   padding: 20px;
   box-sizing: border-box;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
 }
 </style>

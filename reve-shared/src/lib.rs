@@ -347,10 +347,7 @@ fn format_validation(s: &str) -> Result<String, String> {
 fn model_validation(s: &str) -> Result<String, String> {
     match s {
         "realesr-animevideov3" => Ok(s.to_string()),
-        _ => Err(String::from_str(
-            "valid: realesr-animevideov3",
-        )
-        .unwrap()),
+        _ => Err(String::from_str("valid: realesr-animevideov3").unwrap()),
     }
 }
 
@@ -1707,7 +1704,7 @@ pub fn process(
 ) {
     let work_now = Instant::now();
 
-/*     // print all arguments given to function work
+    /*     // print all arguments given to function work
     if args.verbose {
         println!("Arguments given to function work:");
         println!("dar: {}", dar);
@@ -1749,7 +1746,10 @@ pub fn process(
         let md = fs::metadata(&args.inputpath).unwrap();
 
         // Check if same file is used as previous upscale and if yes, resume
-        if args.inputpath == previous_file.to_string_lossy() && args.model == old_args.model && args.scale == old_args.scale {
+        if args.inputpath == previous_file.to_string_lossy()
+            && args.model == old_args.model
+            && args.scale == old_args.scale
+        {
             if md.is_file() {
                 println!(
                     "Same file! '{}' Resuming...",

@@ -18,7 +18,6 @@ pub struct ConfigData {
 
     #[serde(rename = "default-upscale-codec")]
     default_upscale_codec: String,
-
     //#[serde(rename = "default-output-directory")]
     //default_output_directory: String,
 }
