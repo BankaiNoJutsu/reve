@@ -45,35 +45,10 @@ pub struct Video {
 
 impl Video {
     pub fn new(path: &str, output_path: &str, segment_size: u32, upscale_ratio: u8) -> Video {
-        let frame_count = {
-            let output = Command::new("mediainfo")
-                .arg("--Output=Video;%FrameCount%")
-                .arg(path)
-                .output()
-                .expect("failed to execute process");
-            let r = String::from_utf8(output.stdout)
-                .unwrap()
-                .trim()
-                .parse::<u32>();
-            match r {
-                Err(_e) => 0,
-                _ => r.unwrap(),
-            }
-        };
-
-        let frame_rate = {
-            let output = Command::new("mediainfo")
-                .arg("--Output=Video;%FrameRate%")
-                .arg(path)
-                .output()
-                .expect("failed to execute process");
-            String::from_utf8(output.stdout)
-                .unwrap()
-                .trim()
-                .to_string()
-                .parse::<f32>()
-                .unwrap()
-        };
+        let frame_count = get_frame_count(&path.to_string());
+        let frame_rate = get_frame_rate(&path.to_string());
+        // parse frame_rate as f32
+        let frame_rate = frame_rate.parse::<f32>().unwrap();
 
         let parts_num = (frame_count as f32 / segment_size as f32).ceil() as i32;
         let last_segment_size = get_last_segment_size(frame_count, segment_size);
@@ -141,7 +116,6 @@ impl Video {
             .spawn()?
             .stderr
             .ok_or_else(|| Error::new(ErrorKind::Other, "Could not capture standard output."))?;
-
         Ok(BufReader::new(stderr))
     }
 
@@ -166,11 +140,27 @@ impl Video {
             ])
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
-            .spawn()?
+            .spawn()?;
+
+        // get the output of the command
+        let error = stderr
             .stderr
             .ok_or_else(|| Error::new(ErrorKind::Other, "Could not capture standard output."))?;
+        let output = stderr
+            .stdout
+            .ok_or_else(|| Error::new(ErrorKind::Other, "Could not capture standard output."))?;
 
-        Ok(BufReader::new(stderr))
+        // read the output of the command
+        let _output = BufReader::new(output);
+
+        // for each line of the output that contains "done", print it
+        for line in BufReader::new(_output).lines() {
+            let line = line.unwrap();
+            if line.contains("done") {
+                println!("{}", line);
+            }
+        }
+        Ok(BufReader::new(error))
     }
 
     // TODO: args builder for custom commands
