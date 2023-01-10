@@ -45,7 +45,7 @@ pub struct Video {
 
 impl Video {
     pub fn new(path: &str, output_path: &str, segment_size: u32, upscale_ratio: u8) -> Video {
-        let frame_count = get_frame_rate(&path.to_string()).parse::<u32>().unwrap();
+        let frame_count = get_frame_count(&path.to_string());
         let frame_rate = get_frame_rate(&path.to_string()).parse::<f32>().unwrap();
 
         let parts_num = (frame_count as f32 / segment_size as f32).ceil() as i32;

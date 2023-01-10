@@ -394,23 +394,17 @@ function upscaleSingleImage() {
     alert("No video selected");
     return;
   }
-  const imageSavePath = save({
-/*     defaultPath: await invoke("replace_file_suffix", {
-       path: imagePath.value,
-    }), */
-    // Replaces the filename of file in the given path with '<path><filename>-<upscale_factor>x.<codec>.<extension>'
-    defaultPath: imagePath.value.replace(
+  const imageSavePath = imagePath.value.replace(
       /(.*)[\/\\]([^\/\\]+)\.([^\/\\]+)$/,
       `$1/$2-${upscaleFactor.value}x.${upscaleCodec.value}.$3`
-    ),
-  });
+    );
   if (imageSavePath === null) {
     // user cancelled the selection
     return;
   }
   isProcessing.value = true;
   try {
-    const output = invoke("upscale_video", {
+    invoke("upscale_video", {
       path: imagePath.value,
       savePath: imageSavePath,
       upscaleFactor: upscaleFactor.value,
@@ -418,7 +412,6 @@ function upscaleSingleImage() {
       upscaleCodec: upscaleCodec.value,
       segmentSize: segmentSize.value,
     });
-    alert(output);
   } catch (err: any) {
     invoke("write_log", { message: err.toString() });
     alert(err);
