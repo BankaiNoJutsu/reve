@@ -14,10 +14,14 @@ pub struct ConfigData {
     default_upscale_type: String,
 
     #[serde(rename = "default-upscale-factor")]
-    default_upscale_factor: String,
+    default_upscale_factor: u8,
 
     #[serde(rename = "default-upscale-codec")]
     default_upscale_codec: String,
+
+    #[serde(rename = "default-segment-size")]
+    default_segment_size: u32,
+
     //#[serde(rename = "default-output-directory")]
     //default_output_directory: String,
 }
@@ -28,8 +32,9 @@ impl ConfigData {
         Self {
             application_logs: true,
             default_upscale_type: String::from("realesr-animevideov3"),
-            default_upscale_factor: String::from("2"),
+            default_upscale_factor: 2,
             default_upscale_codec: String::from("libx265"),
+            default_segment_size: 1000,
         }
     }
 

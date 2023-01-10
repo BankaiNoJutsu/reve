@@ -15,14 +15,6 @@ impl Logger {
         Self { path }
     }
 
-    /// Returns the path to the log file.
-    pub fn log_file_path(&self) -> String {
-        self.path
-            .to_str()
-            .expect("Failed to convert path to string")
-            .to_string()
-    }
-
     /// Write a message to the log file. If the file does not exist, it will be created. If it does exist, it will be overwritten.
     pub fn log(&self, message: &str) {
         let config = match load_configuration() {
@@ -103,9 +95,4 @@ pub fn write_log(message: &str) {
 #[tauri::command]
 pub fn get_version() -> String {
     env!("CARGO_PKG_VERSION").to_owned()
-}
-
-#[tauri::command]
-pub fn check_if_file_exists(path: String) -> bool {
-    PathBuf::from(path).exists()
 }

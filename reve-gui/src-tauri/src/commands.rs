@@ -8,59 +8,34 @@ use tauri::api::process::{Command, CommandEvent};
 pub fn upscale_video(
     path: String,
     save_path: String,
-    upscale_factor: String,
+    upscale_factor: u8,
     upscale_type: String,
     upscale_codec: String,
+    segment_size: u32,
 ) -> Result<String, String> {
     let upscale_information = format!(
-        "-> Video: {}\n-> Save path: {}\n-> Upscale factor: {}\n-> Upscale type: {}\n-> Upscale codec: {}\n",
-        &path, &save_path, &upscale_factor, &upscale_type, &upscale_codec
+        "-> Video: {}\n-> Save path: {}\n-> Upscale factor: {}\n-> Upscale type: {}\n-> Upscale codec: {}\n-> Segment size: {}",
+        &path, &save_path, &upscale_factor, &upscale_type, &upscale_codec, &segment_size
     );
     println!("{}", &upscale_information);
     utils::write_log(&upscale_information);
 
-    // check if the executable exists
-    if !utils::check_if_file_exists("reve-cli.exe".to_string()) {
-        utils::write_log("Upscaling failed: reve-cli.exe not found");
-        // log the command being executed
-        utils::write_log(
-            format!(
-                "Command: reve-cli.exe -i {} -s {} -o {} -e {}",
-                &path, &upscale_factor, &save_path, &upscale_codec
-            )
-            .as_ref(),
-        );
-        return Err(String::from("Upscaling failed: reve-cli.exe not found"));
-    } else {
-        utils::write_log("reve-cli.exe found");
-        utils::write_log(
-            format!(
-                "Command: reve-cli.exe -i {} -s {} -o {} -e {}",
-                &path, &upscale_factor, &save_path, &upscale_codec
-            )
-            .as_ref(),
-        );
-        let output = Command::new("reve-cli.exe")
-            .args([
-                "-i",
-                &path,
-                "-s",
-                &upscale_factor,
-                "-o",
-                &save_path,
-                "-e",
-                &upscale_codec,
-            ])
-            .output()
-            .expect("failed to execute process");
-        if output.status.success() {
-            utils::write_log(
-                format!("Upscaling finished successfully: {:?}", &output.stderr).as_ref(),
-            );
-            Ok(String::from("Upscaling finished successfully"))
-        } else {
-            utils::write_log(format!("Upscaling failed: {:?}", &output.stderr).as_ref());
-            Err(String::from("Upscaling failed"))
-        }
+    let video = Video::new(&path, &save_path, segment_size, upscale_factor);
+
+    for segment in &video.segments {
+        println!("Segment index: {}", segment.index);
+        println!("Segment size: {}", segment.size);
+        update_progress_bar(segment.index as f64 / video.segments.len() as f64);
     }
+
+    // print the number of segments
+    println!("Number of segments: {}", video.segments.len());
+
+    Ok("Upscaling finished!".to_string())
+}
+
+#[tauri::command]
+// function to update the progress bar in the GUI
+pub fn update_progress_bar(progress: f64) {
+    println!("Progress: {}", progress);
 }

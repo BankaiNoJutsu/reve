@@ -45,35 +45,19 @@ pub struct Video {
 
 impl Video {
     pub fn new(path: &str, output_path: &str, segment_size: u32, upscale_ratio: u8) -> Video {
-        let frame_count = {
-            let output = Command::new("mediainfo")
-                .arg("--Output=Video;%FrameCount%")
-                .arg(path)
-                .output()
-                .expect("failed to execute process");
-            let r = String::from_utf8(output.stdout)
-                .unwrap()
+        let frame_count =
+            get_frame_rate(&path.to_string())
                 .trim()
-                .parse::<u32>();
-            match r {
-                Err(_e) => 0,
-                _ => r.unwrap(),
-            }
-        };
+                .to_string()
+                .parse::<u32>()
+                .unwrap();
 
-        let frame_rate = {
-            let output = Command::new("mediainfo")
-                .arg("--Output=Video;%FrameRate%")
-                .arg(path)
-                .output()
-                .expect("failed to execute process");
-            String::from_utf8(output.stdout)
-                .unwrap()
+        let frame_rate =
+            get_frame_rate(&path.to_string())
                 .trim()
                 .to_string()
                 .parse::<f32>()
-                .unwrap()
-        };
+                .unwrap();
 
         let parts_num = (frame_count as f32 / segment_size as f32).ceil() as i32;
         let last_segment_size = get_last_segment_size(frame_count, segment_size);

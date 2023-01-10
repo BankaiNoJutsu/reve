@@ -155,16 +155,18 @@ interface ImagePathsDisplay {
 }
 
 type UpscaleType = "realesr-animevideov3";
-type UpscaleFactor = "2" | "3" | "4";
+type UpscaleFactor = 2 | 3 | 4;
+type SegmentSize = 500 | 1000 | 2000;
 type UpscaleCodec = "av1" | "x265";
 
 const isProcessing = ref(false);
 const imagePath = ref("");
 const imagePaths: Ref<ImagePathsDisplay[]> = ref([]);
 const imageBlob = ref("");
-const upscaleFactor: Ref<UpscaleFactor> = ref("2");
+const upscaleFactor: Ref<UpscaleFactor> = ref(2);
 const upscaleType: Ref<UpscaleType> = ref("realesr-animevideov3");
 const upscaleCodec: Ref<UpscaleCodec> = ref("x265");
+const segmentSize: Ref<SegmentSize> = ref(1000);
 const isMultipleFiles = ref(false);
 const showMultipleFilesProcessingIcon = ref(false);
 
@@ -367,6 +369,7 @@ function upscaleMultipleImages() {
         upscaleFactor: upscaleFactor.value,
         upscaleType: upscaleType.value,
         upscaleCodec: upscaleCodec.value,
+        segmentSize: segmentSize.value,
       });
       imagePaths.value[i].isReady = true;
     }
@@ -413,6 +416,7 @@ function upscaleSingleImage() {
       upscaleFactor: upscaleFactor.value,
       upscaleType: upscaleType.value,
       upscaleCodec: upscaleCodec.value,
+      segmentSize: segmentSize.value,
     });
     alert(output);
   } catch (err: any) {
